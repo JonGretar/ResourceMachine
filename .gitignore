@@ -1,0 +1,8 @@
+node_modules
+.idea/
+*.log
+*.pdf
+*.epub
+temp/
+.DS_Store
+_book

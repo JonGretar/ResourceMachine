@@ -1,0 +1,40 @@
+<h1>Example Server</h1>
+<h2>Resources</h2>
+<h3>simple.js</h3>
+<p>Simple resource that supports <em>html</em> and <em>json</em> output.
+
+</p>
+<pre><code><span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/simple"</span> <span class="literal">-</span><span class="comment">H</span> <span class="comment">"Accept:</span> <span class="comment">application/json"</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/simple"</span> <span class="literal">-</span><span class="comment">H</span> <span class="comment">"Accept:</span> <span class="comment">text/html"</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/simple"</span> <span class="literal">-</span><span class="comment">H</span> <span class="comment">"Accept:</span> <span class="comment">text/xml"</code></pre>
+<h3>auth.js</h3>
+<p>Example of authentication and authorization in modules.
+Will accept any username with the password &#39;god&#39;.
+Will allow that user access to his own profile but send &#39;forbidden&#39; on other profiles
+
+</p>
+<pre><code><span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/auth/jongretar"</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://jongretar:god@localhost:4040/auth/jongretar"</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://jongretar:god@localhost:4040/auth/steve"</code></pre>
+<h3>repo_list.js &amp;&amp; repo_items.js</h3>
+<p>Example of reusing resources using the context. This could easily be joined into a single resource module.
+
+</p>
+<pre><code><span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/repo/groups"</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/repo/users/jon"</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/repo/users"</span> <span class="literal">-</span><span class="comment">X</span> <span class="comment">POST</span> <span class="literal">-</span><span class="comment">H</span> <span class="comment">'Content</span>-<span class="comment">Type:</span> <span class="comment">application/json'</span> <span class="literal">-</span><span class="comment">d</span> <span class="comment">'{"name":</span> <span class="comment">"Holly</span> <span class="comment">Blackbeard"}'</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/repo/users/stu"</span> <span class="literal">-</span><span class="comment">X</span> <span class="comment">PUT</span> <span class="literal">-</span><span class="comment">H</span> <span class="comment">'Content</span>-<span class="comment">Type:</span> <span class="comment">application/json'</span> <span class="literal">-</span><span class="comment">d</span> <span class="comment">'{"name":</span> <span class="comment">"Stuart</span> <span class="comment">Sexybody"}'</span>
+<span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/repo/users/stu"</span> <span class="literal">-</span><span class="comment">X</span> <span class="comment">DELETE</code></pre>
+<h3>static.js</h3>
+<p>Very basic static file server using streams to avoid buffering up the files.
+
+</p>
+<h3>stream_transform.js</h3>
+<p>In this, more advanced, example we take more control of the request and respone objects to create a streaming JSON multiplier using <a href="https://github.com/dominictarr/JSONStream">JSONStream</a>. For each integer that appars in the array we send the same integer back multiplied by 2. This happens in a duplex streaming manner.
+
+</p>
+<pre><code><span class="comment">curl</span> <span class="literal">-</span><span class="comment">v</span> <span class="comment">"http://localhost:4040/stream_transform"</span> <span class="literal">-</span><span class="comment">X</span> <span class="comment">POST</span> <span class="literal">-</span><span class="comment">H</span> <span class="comment">'Content</span>-<span class="comment">Type:</span> <span class="comment">application/json'</span> <span class="literal">-</span><span class="comment">H</span> <span class="comment">'Accept:</span> <span class="comment">application/json'</span> <span class="literal">-</span><span class="comment">d</span> <span class="comment">'</span>[<span class="comment">1</span>,<span class="comment">2</span>,<span class="comment">3</span>,<span class="comment">4</span>,<span class="comment">5</span>,<span class="comment">6</span>,<span class="comment">7</span>,<span class="comment">8</span>,<span class="comment">9</span>,<span class="comment">10</span>]<span class="comment">'</code></pre>
+<p>To see how this is is working use the example <code>slow_json.js</code> client that sends a 10 integer array as a body but waits 200ms between sending to the server each array element.
+
+</p>
+<pre><code><span class="title">node</span> examples/demo/clients/slow_json.js</code></pre>
