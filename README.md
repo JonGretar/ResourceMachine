@@ -1,4 +1,4 @@
-# Resource Machine [![Build Status](https://secure.travis-ci.org/JonGretar/ResourceMachine.png?branch=master)](http://travis-ci.org/JonGretar/ResourceMachine) [![NPM version](https://badge-me.herokuapp.com/api/npm/ResourceMachine.png)](http://badges.enytc.com/for/npm/ResourceMachine) [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/JonGretar/ResourceMachine/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+# Resource Machine [![Build Status](https://secure.travis-ci.org/JonGretar/ResourceMachine.png?branch=master)](http://travis-ci.org/JonGretar/ResourceMachine) 
 
 > Node.JS port of [Webmachine](https://github.com/basho/webmachine/)
 >
