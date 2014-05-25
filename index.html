@@ -1,79 +1,406 @@
-<!DOCTYPE html>
-<html>
+<!DOCTYPE HTML>
+<html lang="en-US" manifest="./manifest.appcache">
+    
+    <head prefix="og: http://ogp.me/ns# book: http://ogp.me/ns/book#">
+        
+        
+        <meta charset="UTF-8">
+        <title>Introduction | Resource Machine</title>
 
-  <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Resourcemachine : Node.JS implementation of the Erlang WebMachine resource framework" />
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="robots" content="index, follow">
+        <meta name="author" content="JonGretar">
+        <meta name="description" content="ResourceMachine is an attempt to bring to NodeJS the HTTP Status diagram v3 as used by Webmachine.">
+        <meta name="keywords" content="gitbook,github" >
+        <meta name="generator" content="www.gitbook.io">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+        
+        <link rel="next" href="./server/README.html" />
+        
+        
 
-    <title>Resourcemachine</title>
-  </head>
+        <meta property="og:title" content="Introduction | Resource Machine">
+        <meta property="og:site_name" content="Resource Machine">
+        <meta property="og:type" content="book">
+        <meta property="og:locale" content="en_US">
 
-  <body>
+        <meta property="book:author" content="https://github.com/JonGretar">
+        <meta property="book:tag" content="GitBook">
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/JonGretar/ResourceMachine">View on GitHub</a>
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
 
-          <h1 id="project_title">Resourcemachine</h1>
-          <h2 id="project_tagline">Node.JS implementation of the Erlang WebMachine resource framework</h2>
+        <link rel="shortcut icon" href="gitbook/images/favicon.ico" type="image/x-icon">
+        
+        
+    </head>
+    <body>
+        
+        
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/JonGretar/ResourceMachine/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/JonGretar/ResourceMachine/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
+        <link rel="stylesheet" href="gitbook/style.css">
+        
+
+
+        
+    <div class="book" data-github="JonGretar/ResourceMachine" data-level="0" data-basepath="." data-revision="1401025036737">
+    <div class="book-header">
+    <!-- Actions Left -->
+    <a href="#" class="btn pull-left toggle-summary" aria-label="Toggle summary"><i class="fa fa-align-justify"></i></a>
+    
+    <a href="https://github.com/JonGretar/ResourceMachine" target="_blank" class="btn pull-left home-bookmark" aria-label="GitHub home"><i class="fa fa-bookmark-o"></i></a>
+    
+    <a href="#" class="btn pull-left toggle-search" aria-label="Toggle search"><i class="fa fa-search"></i></a>
+    <span id="font-settings-wrapper">
+        <a href="#" class="btn pull-left toggle-font-settings" aria-label="Toggle font settings"><i class="fa fa-font"></i>
+        </a>
+        <div class="dropdown-menu font-settings">
+    <div class="dropdown-caret">
+        <span class="caret-outer"></span>
+        <span class="caret-inner"></span>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
-
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
-
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
-</code></pre>
-
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
-
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
-
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
+    <div class="btn-group btn-block">
+        <button id="reduce-font-size" class="btn btn-default">A</button>
+        <button id="enlarge-font-size" class="btn btn-default">A</button>
     </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Resourcemachine maintained by <a href="https://github.com/JonGretar">JonGretar</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
+    <ul class="list-group font-family-list">
+        <li class="list-group-item" data-font="0">Serif</li>
+        <li class="list-group-item" data-font="1">Sans</li>
+    </ul>
 
+    <div class="btn-group btn-group-xs btn-block color-theme-list">
+        <button type="button" class="btn btn-default" id="color-theme-preview-0" data-theme="0">White</button>
+        <button type="button" class="btn btn-default" id="color-theme-preview-1" data-theme="1">Sepia</button>
+        <button type="button" class="btn btn-default" id="color-theme-preview-2" data-theme="2">Night</button>
+    </div>
+</div>
+
+    </span>
+
+    <!-- Actions Right -->
+    
+    <a href="#" target="_blank" class="btn pull-right google-plus-sharing-link sharing-link" data-sharing="google-plus" aria-label="Share on Google Plus"><i class="fa fa-google-plus"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right facebook-sharing-link sharing-link" data-sharing="facebook" aria-label="Share on Facebook"><i class="fa fa-facebook"></i></a>
+    
+    
+    <a href="#" target="_blank" class="btn pull-right twitter-sharing-link sharing-link" data-sharing="twitter" aria-label="Share on Twitter"><i class="fa fa-twitter"></i></a>
     
 
-  </body>
+    
+    <a href="https://github.com/JonGretar/ResourceMachine/stargazers" target="_blank" class="btn pull-right count-star hidden-xs"><i class="fa fa-star-o"></i> Star (<span>-</span>)</a>
+    <a href="https://github.com/JonGretar/ResourceMachine/watchers" target="_blank" class="btn pull-right count-watch hidden-xs"><i class="fa fa-eye"></i> Watch (<span>-</span>)</a>
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-spinner fa-spin"></i>
+        <a href="./" >Resource Machine</a>
+    </h1>
+</div>
+
+    <div class="book-summary">
+    <div class="book-search">
+        <input type="text" placeholder="Search" class="form-control" />
+    </div>
+    <ul class="summary">
+        
+        
+        
+        <li>
+            <a href="https://github.com/JonGretar" target="blank" class="author-link">About the author</a>
+        </li>
+        
+
+        
+        
+        <li>
+            <a href="https://github.com/JonGretar/ResourceMachine/issues" target="blank"class="issues-link">Questions and Issues</a>
+        </li>
+        
+
+        
+
+        
+        <li class="divider"></li>
+        
+
+        <li data-level="0" data-path="index.html">
+            <a href="./"><i class="fa fa-check"></i> Introduction</a>
+        </li>
+        
+            <li class="chapter " data-level="1" data-path="server/README.html">
+                
+                <a href="./server/README.html">
+                    <i class="fa fa-check"></i> <b>1.</b> Server
+                </a>
+                
+                
+                <ul class="articles">
+                    
+                        <li  data-level="1.1" data-path="server/dispatching.html">
+                            
+                            <a href="./server/dispatching.html">
+                                <i class="fa fa-check"></i> <b>1.1.</b> Dispatching
+                            </a>
+                            
+                        </li>
+                    
+                </ul>
+                
+            </li>
+        
+            <li class="chapter " data-level="2" data-path="resource/README.html">
+                
+                <a href="./resource/README.html">
+                    <i class="fa fa-check"></i> <b>2.</b> Resource Handlers
+                </a>
+                
+                
+                <ul class="articles">
+                    
+                        <li  data-level="2.1" data-path="resource/resource_functions.html">
+                            
+                            <a href="./resource/resource_functions.html">
+                                <i class="fa fa-check"></i> <b>2.1.</b> Resource Functions
+                            </a>
+                            
+                        </li>
+                    
+                        <li  data-level="2.2" data-path="resource/request.html">
+                            
+                            <a href="./resource/request.html">
+                                <i class="fa fa-check"></i> <b>2.2.</b> Request
+                            </a>
+                            
+                        </li>
+                    
+                        <li  data-level="2.3" data-path="resource/response.html">
+                            
+                            <a href="./resource/response.html">
+                                <i class="fa fa-check"></i> <b>2.3.</b> Response
+                            </a>
+                            
+                        </li>
+                    
+                        <li  data-level="2.4" data-path="resource/tips.html">
+                            
+                            <a href="./resource/tips.html">
+                                <i class="fa fa-check"></i> <b>2.4.</b> Tips
+                            </a>
+                            
+                        </li>
+                    
+                </ul>
+                
+            </li>
+        
+            <li class="chapter " data-level="3" data-path="error_handling/README.html">
+                
+                <a href="./error_handling/README.html">
+                    <i class="fa fa-check"></i> <b>3.</b> Error Handling
+                </a>
+                
+                
+                <ul class="articles">
+                    
+                        <li  data-level="3.1" data-path="error_handling/error_list.html">
+                            
+                            <a href="./error_handling/error_list.html">
+                                <i class="fa fa-check"></i> <b>3.1.</b> Error List
+                            </a>
+                            
+                        </li>
+                    
+                        <li  data-level="3.2" data-path="error_handling/custom_errors.html">
+                            
+                            <a href="./error_handling/custom_errors.html">
+                                <i class="fa fa-check"></i> <b>3.2.</b> Custom Errors
+                            </a>
+                            
+                        </li>
+                    
+                </ul>
+                
+            </li>
+        
+            <li class="chapter " data-level="4" data-path="debugging/README.html">
+                
+                <a href="./debugging/README.html">
+                    <i class="fa fa-check"></i> <b>4.</b> Debugging
+                </a>
+                
+                
+                <ul class="articles">
+                    
+                        <li  data-level="4.1" data-path="debugging/dtrace.html">
+                            
+                            <a href="./debugging/dtrace.html">
+                                <i class="fa fa-check"></i> <b>4.1.</b> DTrace
+                            </a>
+                            
+                        </li>
+                    
+                        <li  data-level="4.2" data-path="debugging/visual_tracer.html">
+                            
+                            <a href="./debugging/visual_tracer.html">
+                                <i class="fa fa-check"></i> <b>4.2.</b> Visual Tracer
+                            </a>
+                            
+                        </li>
+                    
+                </ul>
+                
+            </li>
+        
+            <li class="chapter " data-level="5" data-path="mechanics/README.html">
+                
+                <a href="./mechanics/README.html">
+                    <i class="fa fa-check"></i> <b>5.</b> Mechanics
+                </a>
+                
+                
+                <ul class="articles">
+                    
+                        <li  data-level="5.1" data-path="mechanics/diagram.html">
+                            
+                            <a href="./mechanics/diagram.html">
+                                <i class="fa fa-check"></i> <b>5.1.</b> HTTP Diagram
+                            </a>
+                            
+                        </li>
+                    
+                </ul>
+                
+            </li>
+        
+
+        
+        <li class="divider"></li>
+        <li>
+            <a href="http://www.gitbook.io/" target="blank" class="gitbook-link">Generated using GitBook</a>
+        </li>
+        
+    </ul>
+</div>
+
+    <div class="book-body">
+        <div class="body-inner">
+            <div class="page-wrapper" tabindex="-1">
+                <div class="book-progress">
+    <div class="bar">
+        <div class="inner" style="width: 0%;min-width: 0%;"></div>
+    </div>
+    <div class="chapters">
+    
+        <a href="./index.html" title="Introduction" class="chapter done new-chapter" data-progress="0" style="left: 0%;"></a>
+    
+        <a href="./server/README.html" title="Server" class="chapter  new-chapter" data-progress="1" style="left: 6.666666666666667%;"></a>
+    
+        <a href="./server/dispatching.html" title="Dispatching" class="chapter  " data-progress="1.1" style="left: 13.333333333333334%;"></a>
+    
+        <a href="./resource/README.html" title="Resource Handlers" class="chapter  new-chapter" data-progress="2" style="left: 20%;"></a>
+    
+        <a href="./resource/resource_functions.html" title="Resource Functions" class="chapter  " data-progress="2.1" style="left: 26.666666666666668%;"></a>
+    
+        <a href="./resource/request.html" title="Request" class="chapter  " data-progress="2.2" style="left: 33.333333333333336%;"></a>
+    
+        <a href="./resource/response.html" title="Response" class="chapter  " data-progress="2.3" style="left: 40%;"></a>
+    
+        <a href="./resource/tips.html" title="Tips" class="chapter  " data-progress="2.4" style="left: 46.666666666666664%;"></a>
+    
+        <a href="./error_handling/README.html" title="Error Handling" class="chapter  new-chapter" data-progress="3" style="left: 53.333333333333336%;"></a>
+    
+        <a href="./error_handling/error_list.html" title="Error List" class="chapter  " data-progress="3.1" style="left: 60%;"></a>
+    
+        <a href="./error_handling/custom_errors.html" title="Custom Errors" class="chapter  " data-progress="3.2" style="left: 66.66666666666667%;"></a>
+    
+        <a href="./debugging/README.html" title="Debugging" class="chapter  new-chapter" data-progress="4" style="left: 73.33333333333333%;"></a>
+    
+        <a href="./debugging/dtrace.html" title="DTrace" class="chapter  " data-progress="4.1" style="left: 80%;"></a>
+    
+        <a href="./debugging/visual_tracer.html" title="Visual Tracer" class="chapter  " data-progress="4.2" style="left: 86.66666666666667%;"></a>
+    
+        <a href="./mechanics/README.html" title="Mechanics" class="chapter  new-chapter" data-progress="5" style="left: 93.33333333333333%;"></a>
+    
+        <a href="./mechanics/diagram.html" title="HTTP Diagram" class="chapter  " data-progress="5.1" style="left: 100%;"></a>
+    
+    </div>
+</div>
+
+                <div class="page-inner">
+                
+                    <section class="normal" id="section-gitbook_4">
+                    
+                        <h1 id="resource-machine">Resource Machine</h1>
+<p>ResourceMachine is an attempt to bring to NodeJS the <a href="mechanics/diagram.html">HTTP Status diagram v3</a> as used by <a href="https://github.com/basho/webmachine/" target="_blank">Webmachine</a>.</p>
+<p>Although the Resource methods are mostly complete and locked in accordance with the diagram. Other things, such as request and response API may be subject to some changes as we get closer to <em>1.0.0</em>.</p>
+<p>Streaming support is not yet supported but there will be a nice API for that soon.</p>
+<h2 id="quick-note">Quick Note</h2>
+<p>This documentation is still being written. Some chapters are still unclear and other are completely missing. </p>
+<h2 id="minimum-requirements">Minimum requirements</h2>
+<p>This version of Resource Machine currently depends on Harmony Generators as provided by Node.js 0.11.4+.</p>
+<p>This is only because that this was the first method I could think of that allows me to traverse the decision tree without making the stack trace look insane.
+Debuggability is important to me and having a usable stack trace is a strong requirement.</p>
+<p>For further info and to comment please go to <a href="https://github.com/JonGretar/ResourceMachine/issues/1" target="_blank">the related issue</a>.</p>
+<p>All help and suggestions are, as with everything, very welcome.</p>
+<h2 id="examples">Examples</h2>
+<p>For some basic examples check out <a href="http://github.com/JonGretar/ResourceMachine/tree/master/examples" target="_blank">http://github.com/JonGretar/ResourceMachine/tree/master/examples</a>.</p>
+<p>The Readme there will guide you on.</p>
+<h2 id="libraries">Libraries</h2>
+<p> Resource Machine has adapted code and found inspiration from the following libraries.</p>
+<ul>
+<li><a href="https://github.com/basho/webmachine/" target="_blank">Webmachine</a> - The start of it all.</li>
+<li><a href="http://mcavage.me/node-restify/" target="_blank">Restify</a> - Errors and checked the codebase a few times when I was stuck.</li>
+<li><a href="https://github.com/aaronblohowiak/routes.js" target="_blank">Routes.js</a> - The routing library is based on their good work.</li>
+</ul>
+
+                    
+                    </section>
+                
+                </div>
+            </div>
+        </div>
+
+        
+        
+        <a href="./server/README.html" class="navigation navigation-next navigation-unique" aria-label="Next page: Server"><i class="fa fa-angle-right"></i></a>
+        
+    </div>
+</div>
+
+        
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/ace.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.1.3/mode-javascript.js"></script>
+        <script src="gitbook/jsrepl/jsrepl.js" id="jsrepl-script"></script>
+        <script src="gitbook/app.js"></script>
+        
+
+    
+    <script src="gitbook/plugins/gitbook-plugin-mixpanel/plugin.js"></script>
+    
+
+    
+    <script src="http://cdn.mathjax.org/mathjax/2.0-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+
+    
+    <script src="gitbook/plugins/gitbook-plugin-mathjax/plugin.js"></script>
+    
+
+<script>
+require(["gitbook"], function(gitbook) {
+    var config = {};
+    gitbook.start(config);
+});
+</script>
+
+        
+    </body>
+    
 </html>
