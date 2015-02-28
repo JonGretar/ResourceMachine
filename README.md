@@ -1,4 +1,4 @@
-# Resource Machine [![Build Status](https://secure.travis-ci.org/JonGretar/ResourceMachine.png?branch=master)](http://travis-ci.org/JonGretar/ResourceMachine) 
+# Resource Machine [![npm version](https://badge.fury.io/js/resource-machine.svg)](http://badge.fury.io/js/resource-machine) [![Build Status](https://secure.travis-ci.org/JonGretar/ResourceMachine.png?branch=master)](http://travis-ci.org/JonGretar/ResourceMachine) [![Coverage Status](https://coveralls.io/repos/JonGretar/ResourceMachine/badge.svg)](https://coveralls.io/r/JonGretar/ResourceMachine)
 
 > Node.JS port of [Webmachine](https://github.com/basho/webmachine/)
 >
