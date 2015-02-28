@@ -4,5 +4,6 @@ node_modules
 *.pdf
 *.epub
 temp/
+coverage/
 .DS_Store
 _book

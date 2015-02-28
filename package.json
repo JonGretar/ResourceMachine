@@ -47,6 +47,8 @@
     "jshint-stylish": "~0.1.5",
     "supertest": "~0.10.0",
     "gitbook": "~0.4.6",
+    "coveralls": "^2.11.2",
+    "istanbul": "^0.2.16",
     "JSONStream": "~0.7.2"
   },
   "keywords": [
