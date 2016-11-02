@@ -1,6 +1,8 @@
 language: node_js
 node_js:
-  - 4.0
-  - 4.1
+  - "4.0.x"
+  - "5.0.x"
+  - "6.0.x"
+  - "node"
 after_success:
   - "make coveralls"
