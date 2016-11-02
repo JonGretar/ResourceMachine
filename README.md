@@ -3,15 +3,6 @@
 > Node.JS port of [Webmachine](https://github.com/basho/webmachine/)
 >
 
-## Important Note
-
-This version of Resource Machine currently depends on [IO.js](https://iojs.org/) or [NodeJS 0.12+](http://blog.nodejs.org/2015/02/06/node-v0-12-0-stable/) because of it's usage of Harmony Generators.
-
-This is only because that this was the first method I could think of that allows me to traverse the decision tree without making the stack trace look insane.
-Debuggability is important to me and having a usable stack trace is a strong requirement.
-For further info and to comment please go to [the related issue](https://github.com/JonGretar/ResourceMachine/issues/1)
-
-
 ## Documentation
 
 Full documentation can be found in at http://jongretar.github.io/ResourceMachine.
