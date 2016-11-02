@@ -3,6 +3,7 @@
 // var crypto = require('crypto');
 var supertest = require('supertest');
 var bunyan = require('bunyan');
+var Stream = require('stream');
 
 var machine = require('../../lib');
 // var error = require('../../lib/errors');
@@ -16,7 +17,7 @@ function url(path) {
 var request, resource, server = null;
 
 
-describe('Server default resource', function () {
+describe('Routing system', function () {
 
 	before(function (done) {
 		var log = bunyan.createLogger({name: 'testing', level: 'fatal'});
@@ -33,29 +34,30 @@ describe('Server default resource', function () {
 		server.close(done);
 	});
 
-	beforeEach(function () {
-		resource.reset();
-	});
-
 	describe('GET requests', function () {
 
-		it('should respond normally', function (done) {
-			request.get('/')
+		it('should respond to basic string', function (done) {
+			resource.server.addRoute('/basic', resource.resource);
+			request.get('/basic')
 				.expect(200, done);
 		});
 
-		it('should respond with application/json and {}', function (done) {
-			resource.set('toJSON', null, '{}');
-			request.get('/')
-				.expect('Content-Type', /json/)
-				.expect(200, '{}', done);
+		it('should respond to named params', function (done) {
+			resource.server.addRoute('/params/:myparam', resource.resource);
+			request.get('/params/steve')
+				.expect(200, done);
 		});
 
-		it('should error when requested text/xml', function (done) {
-			request.get('/')
-				.set('Accept', 'text/xml')
-				.expect('Content-Type', 'application/json')
-				.expect(406, done);
+		it('should respond to optional named params', function (done) {
+			resource.server.addRoute('/optional_params/:myparam?', resource.resource);
+			request.get('/optional_params')
+				.expect(200, done);
+		});
+
+		it('should respond to splats', function (done) {
+			resource.server.addRoute('/splat/*', resource.resource);
+			request.get('/splat/who/is/this/steve')
+				.expect(200, done);
 		});
 
 	});
