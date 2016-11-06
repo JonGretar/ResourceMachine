@@ -3,6 +3,10 @@
 > Node.JS port of [Webmachine](https://github.com/basho/webmachine/)
 >
 
+## Note
+
+ResourceMachine is **not** ready for production. It's still got pretty bad performance numbers.
+
 ## Documentation
 
 Full documentation can be found in at http://jongretar.github.io/ResourceMachine.
