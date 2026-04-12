@@ -1,0 +1,9 @@
+[book]
+title = "ResourceMachine"
+authors = ["Jón Grétar Borgþórsson"]
+description = "A Node.js port of Webmachine — HTTP decision machine library"
+language = "en"
+src = "doc"
+
+[output.html]
+git-repository-url = "https://github.com/JonGretar/ResourceMachine"

@@ -1,290 +1,317 @@
 # Resource Functions
 
-## init
+All methods are `async` and called by the decision machine at the appropriate point in the HTTP diagram. Override only what you need.
 
-> This is the beginning of the request. You can use this to set things up or doing custom debugging and so on.
+---
 
+## `serviceAvailable()`
 
-## serviceAvailable
+> **Returns:** `Promise<boolean>` — Default: `true`
 
-> Returning false values will result in ServiceUnavailableError
+Return `false` to send `503 Service Unavailable`. Useful for maintenance mode or circuit-breaker patterns.
 
- * **Accepted**: true, false
- * **Default**: true
+---
 
+## `knownMethods()`
 
-## resourceExists
+> **Returns:** `Promise<string[]>` — Default: all common HTTP methods
 
-> Returning false values will result in 404 Not Found
+Return `false` (via `false` not in the list) for a method to send `501 Not Implemented`. Distinct from `allowedMethods` — this is for methods the server has never heard of.
 
- * **Accepted**: true, false
- * **Default**: true
+---
 
-## isAuthorized
+## `uriTooLong()`
 
-> If this returns anything other than true, the response will be 401 Unauthorized. The String return value will be used as the value in the WWW-Authenticate header
+> **Returns:** `Promise<boolean>` — Default: `false`
 
- * **Accepted**: true, String,
- * **Default**: true
+Return `true` to send `414 URI Too Long`.
 
+---
 
-## forbidden
+## `allowedMethods()`
 
-> If true it will respond with an 403 ForbiddenError
+> **Returns:** `Promise<string[]>` — Default: `["GET", "HEAD"]`
 
- * **Accepted**: true, false
- * **Default**: false
+Methods not in this list receive `405 Method Not Allowed`. The response automatically includes an `Allow` header listing the permitted methods.
 
+```ts
+override async allowedMethods() {
+  return ["GET", "HEAD", "PUT", "DELETE"];
+}
+```
 
-## allowMissingPost
+---
 
-> If the resource accepts POST requests to nonexistent resources, then this should return true.
+## `malformedRequest()`
 
- * **Accepted**: true, false
- * **Default**: false
+> **Returns:** `Promise<boolean>` — Default: `false`
 
+Return `true` to send `400 Bad Request`. Called before authorization, so it's appropriate for structural checks (missing required headers, invalid content-type for the method).
 
-## malformedRequest
+---
 
-> If true will respond with 400 BadRequestError
+## `isAuthorized()`
 
- * **Accepted**: true, false
- * **Default**: false
+> **Returns:** `Promise<boolean | string>` — Default: `true`
 
+Return `true` to allow the request. Return `false` or a `string` to send `401 Unauthorized`. When a string is returned it is used as the `WWW-Authenticate` header value.
 
-## uriTooLong
+```ts
+override async isAuthorized() {
+  const auth = this.req.authorization;
+  if (!auth || auth.type !== "Basic") {
+    return 'Basic realm="My App"';
+  }
+  const valid = await checkCredentials(auth.username, auth.password);
+  return valid ? true : 'Basic realm="My App"';
+}
+```
 
-> If true responds with a 414 RequesturiTooLargeError
+---
 
- * **Accepted**: true, false
- * **Default**: false
+## `isForbidden()`
 
+> **Returns:** `Promise<boolean>` — Default: `false`
 
-## knownContentType
+Return `true` to send `403 Forbidden`. Called after `isAuthorized` — use this for authorization (can the authenticated user access this resource?).
 
-> If false it respnds with 415 UnsupportedMediaTypeErro
+---
 
- * **Accepted**: true, false
- * **Default**: true
+## `validContentHeaders()`
 
+> **Returns:** `Promise<boolean>` — Default: `true`
 
-## validContentHeaders
+Return `false` to send `415 Unsupported Media Type`. Validates `Content-*` headers on requests with a body.
 
-> if false will respond with 415 UnsupportedMediaTypeError(Invalid Content-* Headers)
+---
 
- * **Accepted**: true, false
- * **Default**: true
+## `knownContentType()`
 
+> **Returns:** `Promise<boolean>` — Default: `true`
 
-## validEntityLength
+Return `false` to send `415 Unsupported Media Type`. Called when the request has a body.
 
-> If false responds with 413 RequestEntityTooLargeError
+---
 
- * **Accepted**: true, false
- * **Default**: true
+## `validEntityLength()`
 
+> **Returns:** `Promise<boolean>` — Default: `true`
 
-## options
+Return `false` to send `413 Payload Too Large`. Note: the server already enforces `maxBodySize` at the connection level before this is called.
 
-> If the OPTIONS method is supported and is used, the return value of this function is expected to be an object representing header names and values that should appear in the response.
+---
 
+## `options()`
 
- * **Accepted**: {HeaderKey: HeaderValue, ...}
- * **Default**: {}
+> **Returns:** `Promise<Record<string, string>>` — Default: `{}`
 
+Return headers to include in an `OPTIONS` response. The `Allow` header is added automatically.
 
-## allowedMethods
+---
 
-> If a Method not in this list is requested, then a 405 Method Not Allowed will be sent. Note that these are all-caps and are atoms. (single-quoted)
+## `contentTypesProvided()`
 
- * **Accepted**: [...]
- * **Default**: ['GET', 'HEAD']
+> **Returns:** `Promise<Record<string, BodyProvider>>`
 
+Maps `Content-Type` values to body-producer functions. Content negotiation is driven by this. A client `Accept` header that doesn't match any key here receives `406 Not Acceptable`.
 
-## contentTypesProvided
+```ts
+override async contentTypesProvided() {
+  return {
+    "application/json": () => JSON.stringify(this.data),
+    "text/html": () => renderHTML(this.data),
+    "text/plain": () => this.data.name,
+  };
+}
+```
 
-> This should return a object of the form {Mediatype: Handler} where Mediatype is a string of content-type format and the Handler is a string naming the function which can provide a resource representation in that media type. Content negotiation is driven by this return value. For example, if a client request includes an Accept header with a value that does not appear as a first element in any of the return tuples, then a 406 Not Acceptable will be sent.
+Producer functions can return `string | Buffer | Readable | Promise<...>`. Streaming is supported by returning a `Readable`.
 
+---
 
- * **Accepted**: {ContentType: ResourceFunction,...}
- * **Default**: {'application/json': 'toJSON'}
+## `contentTypesAccepted()`
 
-## (toXXX)
+> **Returns:** `Promise<Record<string, () => boolean | Promise<boolean>>>` — Default: `{}`
 
->  body-producing function named as a Handler by contentTypesProvided.
+Maps `Content-Type` values to handler functions for incoming request bodies (PUT, POST). Use `this.req.getBody()` to read the body.
 
- * **Accepted**: String, Buffer, ReadableStream
+```ts
+override async contentTypesAccepted() {
+  return {
+    "application/json": async () => {
+      const raw = await this.req.getBody();
+      const body = JSON.parse(raw.toString());
+      await db.save(this.req.params.id, body);
+      return true;
+    },
+  };
+}
+```
 
-## contentTypesAccepted
+---
 
-> This is used similarly to contentTypesProvided, except that it is for incoming resource representations – for example, PUT requests. Handler functions usually want to use req.getBody(callback) to access the incoming request body.
+## `resourceExists()`
 
+> **Returns:** `Promise<boolean>` — Default: `true`
 
- * **Accepted**: {ContentType: ResourceFunction,...}
- * **Default**: {}
+Return `false` to send `404 Not Found` (or trigger the `previouslyExisted` / `allowMissingPost` branches). Cache the fetched resource on `this` for reuse in other methods.
 
-## (fromXXX)
+---
 
-> POST-processing function named as a Handler by contentTypesAccepted.
+## `generateEtag()`
 
-* **Accepted**: true, false
+> **Returns:** `Promise<string | undefined>` — Default: `undefined`
 
-## deleteResource
+Return a string to set the `ETag` header and enable conditional request handling (`If-Match`, `If-None-Match`).
 
-> This is called when a DELETE request should be enacted, and should return true if the deletion succeeded.
+---
 
- * **Accepted**: true, false
- * **Default**: false
+## `lastModified()`
 
+> **Returns:** `Promise<Date | undefined>` — Default: `undefined`
 
-## deleteCompleted
+Return a `Date` to set the `Last-Modified` header and enable `If-Modified-Since` / `If-Unmodified-Since` checks.
 
-> This is only called after a successful delete_resource call, and should return false if the deletion was accepted but cannot yet be guaranteed to have finished.
+---
 
+## `expires()`
 
- * **Accepted**: true, false
- * **Default**: true
+> **Returns:** `Promise<Date | undefined>` — Default: `undefined`
 
+Return a `Date` to set the `Expires` header.
 
-## postIsCreate
+---
 
-> If POST requests should be treated as a request to put content into a (potentially new) resource as opposed to being a generic submission for processing, then this function should return true. If it does return true, then *createPath* will be called and the rest of the request will be treated much like a PUT to the Path entry returned by that call.
+## `multipleChoices()`
 
+> **Returns:** `Promise<boolean>` — Default: `false`
 
- * **Accepted**: true, false
- * **Default**: false
+Return `true` to send `300 Multiple Choices`.
 
+---
 
-## createPath
+## `previouslyExisted()`
 
-> This will be called on a POST request if postIsCreate returns true. It is an error for this function to not produce a Path if postIsCreate returns true. The Path returned should be a valid URI part following the dispatcher prefix. That Path will replace the previous one in the return value of wrq:disp_path(ReqData) for all subsequent resource function calls in the course of this request.
+> **Returns:** `Promise<boolean>` — Default: `false`
 
+Return `true` when a resource once existed but no longer does. Enables the `movedPermanently` / `movedTemporarily` checks before falling back to `410 Gone`.
 
- * **Accepted**: String
- * **Default**: undefined
+---
 
-## processPost
+## `movedPermanently()`
 
-> If postIsCreate returns false, then this will be called to process any POST requests. If it succeeds, it should return true.
+> **Returns:** `Promise<string | false>` — Default: `false`
 
-* **Accepted**: true, false
-* **Default**: false
+Return a URL string to send `301 Moved Permanently` with that `Location`. Return `false` to continue.
 
-## baseURI
+---
 
-> Override the BaseURI(http://myserver.com/). Used for POST Forwarding and others.
+## `movedTemporarily()`
 
- * **Accepted**: undefined, String
- * **Default**: undefined
+> **Returns:** `Promise<string | false>` — Default: `false`
 
+Return a URL string to send `307 Temporary Redirect` with that `Location`. Return `false` to continue.
 
-## languageAvailable
+---
 
-> If false will respond with 406 NotAcceptableError.
+## `allowMissingPost()`
 
- * **Accepted**: true, false
- * **Default**: true
+> **Returns:** `Promise<boolean>` — Default: `false`
 
+Return `true` to allow POST requests to resources that don't exist (`resourceExists` returned `false`).
 
-## charsetsProvided
+---
 
-> If this is anything other than undefined, it must be an object of of the form {Charset: Converter} where Charset is a string naming a charset and Converter is a  function in the resource which will be called on the produced body in a GET and ensure that it is in Charset. example: {'utf-8': function (x) { return charsetter.convert(x, 'utf8'); }}
+## `postIsCreate()`
 
+> **Returns:** `Promise<boolean>` — Default: `false`
 
- * **Accepted**: {Charset: function, ...}
- * **Default**: undefined
+Return `true` to treat POST as a create-and-redirect operation. When `true`, `createPath()` is called and the request continues as a PUT to that path.
 
+---
 
-## encodingsProvided
+## `createPath()`
 
-> This must be a list of pairs where in each pair Encoding is a string naming a valid content encoding and Encoder is a function which will be called on the produced body in a GET and ensure that it is so encoded. One useful setting is to have the function check on method, and on GET requests return {'identity': function (x) { return x; }, 'gzip': function (x) { return gzip.zip(x); }} as this is all that is needed to support gzip content encoding.
+> **Returns:** `Promise<string | undefined>` — Default: `undefined`
 
+Required when `postIsCreate()` returns `true`. Return the URI path for the newly created resource.
 
- * **Accepted**: {Encoding: function, ...}
- * **Default**: {'identity': function (x, cb) { return cb(x); }}
+---
 
+## `processPost()`
 
-## variances
+> **Returns:** `Promise<boolean | string>` — Default: `false`
 
-> If this function is implemented, it should return a list of strings with header names that should be included in a given response’s Vary header. The standard conneg headers (Accept, Accept-Encoding, Accept-Charset, Accept-Language) do not need to be specified here as ResourceMachine will add the correct elements of those automatically depending on resource behavior.
+Called when `postIsCreate()` returns `false`. Perform the POST action. Return `true` on success, or a URL string to redirect.
 
+---
 
- * **Accepted**: [...]
- * **Default**: []
+## `isConflict()`
 
+> **Returns:** `Promise<boolean>` — Default: `false`
 
-## isConflict
+Return `true` to send `409 Conflict` on PUT requests.
 
-> If this returns true, the client will receive a 409 Conflict.
+---
 
- * **Accepted**: true, false
- * **Default**: false
+## `deleteResource()`
 
+> **Returns:** `Promise<boolean>` — Default: `false`
 
-## multipleChoices
+Perform the DELETE. Return `true` if deletion was initiated.
 
-> If this returns true, then it is assumed that multiple representations of the response are possible and a single one cannot be automatically chosen, so a 300 Multiple Choices will be sent instead of a 200.
+---
 
- * **Accepted**: true, false
- * **Default**: false
+## `deleteCompleted()`
 
+> **Returns:** `Promise<boolean>` — Default: `true`
 
-## previouslyExisted
+Called after a successful `deleteResource`. Return `false` if deletion is async and not yet confirmed (sends `202 Accepted` instead of `204 No Content`).
 
-> If true says that the item being updated once existed. Forwards to moved* methods.
+---
 
- * **Accepted**: true, false
- * **Default**: false
+## `languageAvailable()`
 
+> **Returns:** `Promise<boolean>` — Default: `true`
 
-## movedPermanently
+Return `false` to send `406 Not Acceptable` when no acceptable language is available.
 
-> If a string responds with 301 with the String as a Location header
+---
 
- * **Accepted**: false, String
- * **Default**: false
+## `charsetsProvided()`
 
+> **Returns:** `Promise<Record<string, () => Transform> | undefined>` — Default: `undefined`
 
-## movedTemporarily
+Return a map of charset name to transform stream factory. When `undefined`, no charset negotiation is performed.
 
-> If a string responds with 307 with the String as a Location header.
+---
 
- * **Accepted**: false, String
- * **Default**: false
+## `encodingsProvided()`
 
+> **Returns:** `Promise<Record<string, () => Transform>>` — Default: `{ identity: ... }`
 
-## lastModified
+Return a map of encoding name to transform stream factory. The `identity` encoding (no-op) is always available.
 
-> If a date set the Last-Modified header to that value.
+---
 
- * **Accepted**: undefined, Date()
- * **Default**: undefined
+## `variances()`
 
+> **Returns:** `Promise<string[]>` — Default: `[]`
 
-## expires
+Additional header names to include in the `Vary` response header. The standard negotiation headers (`Accept`, `Accept-Language`, `Accept-Charset`, `Accept-Encoding`) are added automatically.
 
-> If a date set the Expires header to that value.
+---
 
- * **Accepted**: undefined, Date()
- * **Default**: undefined
+## `validateContentChecksum()`
 
+> **Returns:** `Promise<boolean | undefined>` — Default: `undefined`
 
-## generateEtag
+When the request includes a `Content-MD5` header: return `true` to accept, `false` to reject with `400 Bad Request`, or `undefined` to let ResourceMachine validate it automatically.
 
-> If this returns a value, it will be used as the value of the ETag header and for comparison in conditional requests.
+---
 
- * **Accepted**: undefined, String
- * **Default**: undefined
+## `finishRequest()`
 
+> **Returns:** `Promise<void>`
 
-## validateContentChecksum
-
-> If the Content-MD5 header and validateContentChecksum returns false responds with a 400 BadRequestError. if validateContentChecksum is unset a default md5 checksumming function is run.
-
- * **Accepted**: undefined, true, false
- * **Default**: undefined
-
-
-## finish
-
-> You can do some finalizing and cleanup here
+Called at the end of every request (success or error). Use for cleanup, metrics, or finalization logic.

@@ -1,56 +1,99 @@
 # Request
 
-Request extends [http.IncomingMessage](http://nodejs.org/api/http.html#http_http_incomingmessage) with the following attributes and methods.
+`RMRequest` extends Node's [`http.IncomingMessage`](https://nodejs.org/api/http.html#class-httpincomingmessage) with the following additions.
 
-## Request Attributes
+## Properties
 
-### req.context
+### `req.params`
 
-> The arbitrary context as set by server.addRoute.
+Route parameters matched from the path pattern.
 
-### req.query
+```ts
+// Route: "/articles/:id"
+// URL:   "/articles/42"
+this.req.params.id; // "42"
+```
 
-> The URI query parameter
+### `req.query`
 
-### req.params
+Parsed query string as a plain object. Multi-value keys become arrays.
 
-> The matched route params
+```ts
+// URL: "/search?q=foo&tag=a&tag=b"
+this.req.query.q; // "foo"
+this.req.query.tag; // ["a", "b"]
+```
 
-### req.splats
+### `req.pathname`
 
-> The matched route params
+The path portion of the URL, without the query string.
 
-### req.search
+```ts
+// URL: "/articles/42?format=json"
+this.req.pathname; // "/articles/42"
+```
 
-> The URI serch parameter
+### `req.search`
 
-### req.pathname
+The raw query string including the leading `?`.
 
-> The URI Path
+```ts
+this.req.search; // "?format=json"
+```
 
-### req.language
+### `req.choices`
 
-> The chosen langage as negotiated by vXXX
+Negotiated content choices, set by the decision tree.
 
-### req.contentType
+```ts
+req.choices.contentType; // e.g. "application/json"
+req.choices.language; // e.g. "en"
+req.choices.encoding; // e.g. "identity"
+req.choices.charset; // e.g. "utf-8"
+```
 
-> The chosen content type as negotiated by vXXX
+### `req.abortSignal`
 
-### req.encoding
+An `AbortSignal` that fires when the client disconnects. Pass this to database queries or `fetch()` calls to cancel in-flight work.
 
-> The chosen encoding as negotiated by vXXX
+```ts
+const data = await db.find(id, { signal: this.req.abortSignal });
+```
 
-### req.charset
+### `req.log`
 
-> The chosen charset as negotiated by vXXX
+A [pino](https://getpino.io) logger scoped to this request (attached by `pino-http`). Includes `requestId` in every log line.
 
+```ts
+this.req.log.info({ userId }, "Fetching user");
+this.req.log.error({ err }, "Database query failed");
+```
 
-## Request Methods
+## Methods
 
-### req.getBody(*cb*)
+### `req.getBody()`
 
-> Once the body has completed runs the callback with an error parameter and the incoming body as a Buffer.
+Returns `Promise<Buffer>`. Resolves once the full request body has been buffered. Body buffering starts immediately on connection — calling `getBody()` from any resource method is safe.
 
-### req.enableTrace(*directory*)
+```ts
+const raw = await this.req.getBody();
+const body = JSON.parse(raw.toString()) as MyType;
+```
 
-> **Warning. This badly affects performance**. Writes a detailed JSON file describing the request and all decisions into a file inside *directory*
+Bodies exceeding `maxBodySize` (default 1 MB) are rejected with `413 Payload Too Large` before buffering begins.
+
+### `req.baseURI(path)`
+
+Constructs an absolute URI from a path using the incoming `Host` header.
+
+```ts
+this.req.baseURI("/articles/42"); // "http://example.com/articles/42"
+```
+
+### `req.enableTrace(directory)`
+
+Writes a JSON trace file for this request into `directory`. Each file records the sequence of decision tree nodes visited. **Enabling this has a significant performance cost** — use only during development.
+
+```ts
+this.req.enableTrace("/tmp/rm-traces");
+```

@@ -1,57 +1,84 @@
 # Dispatching
 
-Routes are added using the function `server.addRoute(path, module, [context]);`
+Routes are added with `server.addRoute(path, ResourceClass)`.
 
-## Attributes
+The router uses [find-my-way](https://github.com/delvedor/find-my-way) (the same trie router as Fastify), giving O(1) route matching regardless of the number of routes.
 
-### Path
+## Path Syntax
 
-A string that matches on incoming uri's using [routes.js](https://github.com/aaronblohowiak/routes.js) for it's routing table management.
+### Static paths
 
-req.params will hold any parameters defined in the uri and req.splats will hold the splats.
+```
+"/articles"       matches only "/articles"
+"/articles/new"   matches only "/articles/new"
+```
 
-Basic string:
+### Named parameters
 
-    "/articles" will only match routes that == "/articles".
+```
+"/articles/:id"           matches "/articles/42",  params: { id: "42" }
+"/users/:user/posts/:id"  matches "/users/jon/posts/5", params: { user: "jon", id: "5" }
+```
 
-Named parameters:
+Parameters are available at `this.req.params.id` inside resource methods.
 
-    "/articles/:title" will only match routes like "/articles/hello", but *not* "/articles/".
+### Wildcard
 
-Optional named parameters:
+```
+"/assets/*"   matches "/assets/img/logo.png", params: { "*": "img/logo.png" }
+```
 
-    "/articles/:title?" will match "/articles/hello" AND "/articles/"
+### Regex constraints on parameters
 
-Periods before optional parameters are also optional:
+```
+"/lang/:lang([a-z]{2})"   matches "/lang/en" but not "/lang/english"
+```
 
-    "/:n.:f?" will match "/1" and "/1.json"
+## Resource Class
 
-Splats!:
+The second argument to `addRoute` must be a class that extends `Resource`. The decision machine constructs a new instance per request:
 
-    "/assets/*" will match "/assets/blah/blah/blah.png" and "/assets/".
+```ts
+import { createServer, Resource } from "resource-machine";
 
-    "/assets/*.*" will match "/assets/1/2/3.js" as splats: ["1/2/3", "js"]
+class PingResource extends Resource {
+  override async contentTypesProvided() {
+    return { "text/plain": () => "pong" };
+  }
+}
 
-Mix splat with named parameters:
+const server = createServer();
+server.addRoute("/ping", PingResource);
+```
 
-    "/account/:id/assets/*" will match "/account/2/assets/folder.png" as req.params: {id: 2}, req.splats:["folder.png"]
+### Injecting shared state via factory
 
-Named RegExp:
+When a resource needs access to a shared object (e.g. a database connection pool), use a factory function that closes over the shared value and returns a `ResourceClass`:
 
-    "/lang/:lang([a-z]{2})" will match "/lang/en" but not "/lang/12" or "/lang/eng"
+```ts
+import type { ResourceClass } from "resource-machine";
+import { Resource } from "resource-machine";
+import type { Database } from "./db.js";
 
-Raw RegExp:
+export function createArticleResource(db: Database): ResourceClass {
+  return class ArticleResource extends Resource {
+    private article: Article | null = null;
 
-    /^\/(\d{2,3}-\d{2,3}-\d{4})\.(\w*)$/ (note no quotes, this is a RegExp, not a string.) will match "/123-22-1234.json". Each match group will be an entry in splats: ["123-22-1234", "json"]
+    override async resourceExists() {
+      this.article = await db.find(this.req.params.id ?? "");
+      return this.article !== null;
+    }
 
+    override async contentTypesProvided() {
+      return {
+        "application/json": () => JSON.stringify(this.article),
+      };
+    }
+  };
+}
 
-Further info at [routes.js](https://github.com/aaronblohowiak/routes.js).
+// Registration
+server.addRoute("/articles/:id", createArticleResource(db));
+```
 
-
-### Module
-
-is a NodeJS module or an object that follows the [Resource](../resource/README.html) setup.
-
-### Context
-
-Optional value that will be passed forward to requests as req.context.
+Shared resources (DB pools, config) belong on class statics or module scope — not on `this`. `this` is per-request.

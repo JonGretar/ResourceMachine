@@ -1,31 +1,60 @@
 # Resource Handlers
 
-## Basics
+Resources are TypeScript classes that extend the `Resource` base class. Override only the methods you need — every method has a safe HTTP default.
 
-Resource functions all follow the pattern of being exported functions taking that attributes request, response and a callback.
-The callback follows the standard err, result pattern of NodeJS.
+```ts
+import { Resource } from "resource-machine";
 
-```js
-exports.serviceAvailable = function (req, res, cb) {
-  if ( database.isConnected() === true ) {
-    cb(null, true);
-  } else {
-    req.log.error({database_id: database.id}, 'Unable to open a connection to the database');
-    cb(null, false);
+class ArticleResource extends Resource {
+  private article: Article | null = null;
+
+  override async allowedMethods() {
+    return ["GET", "HEAD", "PUT", "DELETE"];
   }
-};
+
+  override async resourceExists() {
+    // Cache the DB lookup on `this` — reused by contentTypesProvided
+    this.article = await db.find(this.req.params.id ?? "");
+    return this.article !== null;
+  }
+
+  override async contentTypesProvided() {
+    return {
+      "application/json": () => JSON.stringify(this.article),
+    };
+  }
+}
 ```
 
-If you do not implement a function in your resource it will fall back to the default handlers response.
+## Per-Request Instantiation
 
-## Name
+The router holds the class. The decision machine calls `new ArticleResource(req, res)` for each incoming request. This means:
 
-Adding a name to the resource handler can help with debugging and logging.
+- `this.req` and `this.res` are available in every method.
+- `this` is a natural cache for data fetched during one decision (like `resourceExists`) and reused in a later one (like `contentTypesProvided`).
+- There is no shared mutable state between concurrent requests.
 
-```js
-exports.name = 'MyResource';
-```
+## Available in All Methods
 
-## Default Resource
+| Property          | Type                                  | Description                                     |
+| ----------------- | ------------------------------------- | ----------------------------------------------- |
+| `this.req`        | `RMRequest`                           | Augmented incoming request                      |
+| `this.res`        | `RMResponse`                          | Augmented server response                       |
+| `this.req.params` | `Record<string, string \| undefined>` | Route parameters                                |
+| `this.req.query`  | `Record<string, string \| string[]>`  | Query string parameters                         |
+| `this.req.log`    | `pino.Logger`                         | Per-request pino logger (attached by pino-http) |
 
-*TODO: Explain how to change the default Resource.*
+## Defaults
+
+If you do not override a method, it falls back to a default that produces correct HTTP behavior for a read-only resource:
+
+| Method                 | Default                          |
+| ---------------------- | -------------------------------- |
+| `serviceAvailable`     | `true`                           |
+| `allowedMethods`       | `["GET", "HEAD"]`                |
+| `resourceExists`       | `true`                           |
+| `isAuthorized`         | `true`                           |
+| `isForbidden`          | `false`                          |
+| `contentTypesProvided` | `{ "application/json": toJSON }` |
+
+See [Resource Functions](resource_functions.md) for the full list.
