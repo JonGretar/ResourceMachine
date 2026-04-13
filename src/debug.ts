@@ -103,7 +103,7 @@ export function notifyRequestEnd(req: RMRequest, res: RMResponse): void {
 // ─── Trace file writer ────────────────────────────────────────────────────────
 
 async function writeTraceFile(req: RMRequest, res: RMResponse): Promise<void> {
-  const dir = req._decisionTrace.traceDirectory!;
+  const dir = req._decisionTrace.traceDirectory ?? "";
   const ts = new Date().toISOString().replace(/[:.]/g, "-");
   const fileName = `${req.requestId}_${ts}.json`;
 

@@ -1,0 +1,23 @@
+repos:
+  - repo: local
+    hooks:
+      - id: biome-check
+        name: biome check
+        language: system
+        entry: npm run check
+        pass_filenames: false
+        always_run: true
+
+      - id: typecheck
+        name: tsc --noEmit
+        language: system
+        entry: npm run typecheck
+        pass_filenames: false
+        always_run: true
+
+      - id: tests
+        name: tests
+        language: system
+        entry: npm test
+        pass_filenames: false
+        always_run: true

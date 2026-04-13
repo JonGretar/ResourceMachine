@@ -44,9 +44,14 @@
     "lint": "biome lint src",
     "format": "biome format --write src",
     "check": "biome check src",
+    "typecheck": "tsc --noEmit",
     "bench:server": "node --import tsx/esm bench/server.ts",
     "bench": "autocannon -c 100 -d 10 http://localhost:3000/ping && autocannon -c 100 -d 10 http://localhost:3000/async",
-    "bench:sustained": "autocannon -c 100 -d 60 http://localhost:3000/ping"
+    "bench:sustained": "autocannon -c 100 -d 60 http://localhost:3000/ping",
+    "prepare": "simple-git-hooks"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npm run check"
   },
   "dependencies": {
     "find-my-way": "^9.0.0",
@@ -59,6 +64,7 @@
     "@biomejs/biome": "^1.9.0",
     "@types/negotiator": "^0.6.3",
     "@types/node": "^22.0.0",
+    "simple-git-hooks": "^2.13.1",
     "supertest": "^7.0.0",
     "tsup": "^8.0.0",
     "tsx": "^4.21.0",

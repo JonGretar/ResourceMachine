@@ -1,19 +1,23 @@
 import { finished } from "node:stream/promises";
-import type { RMRequest } from "./request.js";
-import type { RMResponse } from "./response.js";
-import type { Resource } from "./resource.js";
-import { HttpError } from "./errors/index.js";
+import { notifyDecision, notifyRequestEnd, notifyRequestStart } from "./debug.js";
 import { type DecisionFn, start } from "./decision_tree/v3/tree.js";
-import { notifyRequestStart, notifyDecision, notifyRequestEnd } from "./debug.js";
+import { HttpError } from "./errors/index.js";
+import type { RMRequest } from "./request.js";
+import type { Resource } from "./resource.js";
+import type { RMResponse } from "./response.js";
 
 export type ResourceClass = new (req: RMRequest, res: RMResponse) => Resource;
 
-export async function handleRequest(ResourceCtor: ResourceClass, req: RMRequest, res: RMResponse): Promise<void> {
+export async function handleRequest(
+  ResourceCtor: ResourceClass,
+  req: RMRequest,
+  res: RMResponse,
+): Promise<void> {
   const resource = new ResourceCtor(req, res);
   notifyRequestStart(req);
 
   try {
-    let decision: DecisionFn | void = start;
+    let decision: DecisionFn | undefined = start;
     while (typeof decision === "function") {
       const current: DecisionFn = decision;
       notifyDecision(req, current.name);

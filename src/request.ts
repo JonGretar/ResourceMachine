@@ -118,7 +118,7 @@ export function augmentRequest(req: IncomingMessage, options: RequestOptions = {
     return new Promise((resolve, reject) => {
       if (bodyFinished) {
         if (bodyError) return reject(bodyError);
-        return resolve(resolvedBuffer!);
+        return resolve(resolvedBuffer ?? Buffer.alloc(0));
       }
 
       const onAbort = (): void => {

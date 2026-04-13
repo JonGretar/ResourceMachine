@@ -39,7 +39,8 @@ export function encodeBodyIfSet(req: RMRequest, res: RMResponse): void {
 }
 
 export function encodeBody(req: RMRequest, res: RMResponse): void {
-  const charsetFn = req.choices.charset !== undefined ? req._charsetsProvided?.[req.choices.charset] : undefined;
+  const charsetFn =
+    req.choices.charset !== undefined ? req._charsetsProvided?.[req.choices.charset] : undefined;
   const encodingFn =
     req.choices.encoding !== undefined && req.choices.encoding !== "identity"
       ? req._encodingsProvided?.[req.choices.encoding]
@@ -58,8 +59,12 @@ export function encodeBody(req: RMRequest, res: RMResponse): void {
   }
 
   // Transform path: charset and/or encoding transforms required.
-  const charsetStream: Transform = charsetFn ? charsetFn() : new PassThrough({ allowHalfOpen: false });
-  const encodeStream: Transform = encodingFn ? encodingFn() : new PassThrough({ allowHalfOpen: false });
+  const charsetStream: Transform = charsetFn
+    ? charsetFn()
+    : new PassThrough({ allowHalfOpen: false });
+  const encodeStream: Transform = encodingFn
+    ? encodingFn()
+    : new PassThrough({ allowHalfOpen: false });
 
   // Wrap buffer body in a readable so the pipeline is uniform.
   if (res._bodyBuffer !== null) {

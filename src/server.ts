@@ -2,11 +2,11 @@ import { createServer as createHttpServer } from "node:http";
 import type { Server as HttpServer } from "node:http";
 import pino from "pino";
 import { pinoHttp } from "pino-http";
-import { Router } from "./routes.js";
+import { type ResourceClass, handleRequest } from "./decision_core.js";
+import { NotFoundError, PayloadTooLargeError } from "./errors/index.js";
 import { augmentRequest } from "./request.js";
 import { augmentResponse } from "./response.js";
-import { handleRequest, type ResourceClass } from "./decision_core.js";
-import { NotFoundError, PayloadTooLargeError } from "./errors/index.js";
+import { Router } from "./routes.js";
 
 export interface ServerOptions {
   /** Server name — used as pino logger name. Default: 'resource-machine' */
@@ -47,7 +47,7 @@ export function createServer(options: ServerOptions = {}): RMServer {
     // Fast-reject: Content-Length already exceeds limit — no need to buffer.
     const rawCL = req.headers["content-length"];
     if (rawCL !== undefined) {
-      const declared = parseInt(rawCL, 10);
+      const declared = Number.parseInt(rawCL, 10);
       if (!Number.isNaN(declared) && declared > maxBodySize) {
         new PayloadTooLargeError("Request body exceeds maximum size").toResponse(res);
         req.resume(); // drain so the connection can be reused
@@ -55,7 +55,10 @@ export function createServer(options: ServerOptions = {}): RMServer {
       }
     }
 
-    const rmReq = augmentRequest(req, options.maxBodySize !== undefined ? { maxBodySize: options.maxBodySize } : {});
+    const rmReq = augmentRequest(
+      req,
+      options.maxBodySize !== undefined ? { maxBodySize: options.maxBodySize } : {},
+    );
     const rmRes = augmentResponse(res);
 
     const match = router.match(req.method ?? "GET", rmReq.pathname);
