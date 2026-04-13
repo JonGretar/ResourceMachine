@@ -95,7 +95,7 @@ npm install resource-machine
 
 Full documentation at [jongretar.github.io/ResourceMachine](https://jongretar.github.io/ResourceMachine).
 
-Examples are in [`examples/`](https://github.com/JonGretar/ResourceMachine/tree/master/examples).
+Examples are in [`examples/`](https://github.com/JonGretar/ResourceMachine/tree/main/examples).
 
 ## License
 
