@@ -1,9 +1,13 @@
 /**
  * Minimal benchmark server.
  *
- * Two routes:
- *   GET /ping     — trivial JSON response, no async work
- *   GET /async    — simulates one await (microtask), still no I/O
+ * Routes:
+ *   GET /ping          — trivial JSON response, no async work
+ *   GET /async         — simulates one await (microtask), still no I/O
+ *   GET /articles/:id  — route parameter extraction
+ *   GET /etag          — resource with a fixed ETag
+ *   GET /missing       — resource that does not exist (→ 404 path)
+ *   POST /submit       — buffers a request body (→ 204)
  *
  * Run with:
  *   node --import tsx/esm bench/server.ts
@@ -51,6 +55,74 @@ class AsyncResource extends Resource {
   }
 }
 
+// ── /articles/:id — route parameter extraction ────────────────────────────────
+
+class ArticleResource extends Resource {
+  constructor(req: RMRequest, res: RMResponse) {
+    super(req, res);
+  }
+
+  override async contentTypesProvided() {
+    const id = this.req.params["id"];
+    return {
+      "application/json": () => `{"id":${JSON.stringify(id)}}`,
+    };
+  }
+}
+
+// ── /etag — fixed ETag for conditional request benchmarking ──────────────────
+
+class ETagResource extends Resource {
+  constructor(req: RMRequest, res: RMResponse) {
+    super(req, res);
+  }
+
+  override async generateEtag(): Promise<string> {
+    return "v1";
+  }
+
+  override async contentTypesProvided() {
+    return {
+      "application/json": () => '{"data":"stable"}',
+    };
+  }
+}
+
+// ── /missing — resource that does not exist → 404 ────────────────────────────
+
+class MissingResource extends Resource {
+  constructor(req: RMRequest, res: RMResponse) {
+    super(req, res);
+  }
+
+  override async resourceExists(): Promise<boolean> {
+    return false;
+  }
+}
+
+// ── /submit — POST endpoint that buffers request body → 204 ──────────────────
+
+class SubmitResource extends Resource {
+  constructor(req: RMRequest, res: RMResponse) {
+    super(req, res);
+  }
+
+  override async allowedMethods(): Promise<string[]> {
+    return ["GET", "HEAD", "POST"];
+  }
+
+  override async processPost(): Promise<boolean | string> {
+    await this.req.getBody();
+    return true;
+  }
+
+  override async contentTypesProvided() {
+    return {
+      "application/json": () => '{"ok":true}',
+    };
+  }
+}
+
 // ── Server ────────────────────────────────────────────────────────────────────
 
 const port = Number(process.env.PORT ?? 3000);
@@ -58,7 +130,11 @@ const port = Number(process.env.PORT ?? 3000);
 const server = createServer({ logger });
 server.addRoute("/ping", PingResource);
 server.addRoute("/async", AsyncResource);
+server.addRoute("/articles/:id", ArticleResource);
+server.addRoute("/etag", ETagResource);
+server.addRoute("/missing", MissingResource);
+server.addRoute("/submit", SubmitResource);
 
 await server.listen(port);
 console.log(`Benchmark server listening on http://localhost:${port}`);
-console.log("Routes: GET /ping  GET /async");
+console.log("Routes: GET /ping  GET /async  GET /articles/:id  GET /etag  GET /missing  POST /submit");
